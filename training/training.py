@@ -12,10 +12,12 @@ import logging
 import os
 import wandb
 import sys
+from create_train_data import main as create_train_data
 
 #wandb.login()
 #wandb.init()
 
+#project_root = os.path.abspath(os.path.join(os.getcwd(), '..'))
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
     sys.path.append(project_root)
@@ -23,14 +25,17 @@ if project_root not in sys.path:
 from modelling_edullm import EduLLMForCausalLM, MixtralConfig
 
 def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, batch_size = 5):
+    create_train_data()
     model_types = ['mixtral', 'damex', 'xmoe']
     model_type = model_types[model_number]
     repo_name = "amnae/base_edu_llm_" + model_type
+    dataset_path = "data/combined_dataset"
 
     print('Loading sparse base model...')
     print(cache_dir)
     model = EduLLMForCausalLM.from_pretrained("amnae/base_edu_llm_mixtral",
                                             torch_dtype=torch.bfloat16,
+                                            device_map = device,
                                             cache_dir = cache_dir)
 
     if model_number == 0:
@@ -72,6 +77,7 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, 
     train_dataset = train_dataset.remove_columns(cols_to_remove)
 
     encoded_dataset = train_dataset.map(lambda examples: tokenizer(examples['text']), batched=True)
+    print("Dataset loaded and encoded")
 
     peft_config = LoraConfig(
         lora_alpha=32,
@@ -83,7 +89,8 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, 
     )
 
     model = get_peft_model(model, peft_config)
-    model.print_trainable_parameters
+    model.print_trainable_parameters()
+    print("Model peft'd")
 
     args = SFTConfig(
         output_dir=repo_name+"_sft",
@@ -115,8 +122,8 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, 
     print("Saving model...")
     for i in range(0,10):
         try:
-            model.push_to_hub(repo_name, cache_dir=cache_dir)
-            tokenizer.push_to_hub(repo_name)
+            model.push_to_hub(repo_name + "_trained", cache_dir=cache_dir)
+            tokenizer.push_to_hub(repo_name + "_trained")
         except Exception as error:
             print(error)
             print(f"Trying again: {i+1} / 10")
