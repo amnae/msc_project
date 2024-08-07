@@ -1,9 +1,7 @@
 from transformers import AutoTokenizer
 import torch
 from datasets import load_dataset, load_from_disk
-from datetime import datetime
 from peft import LoraConfig, get_peft_model 
-from torch.profiler import profile, record_function, ProfilerActivity
 import argparse
 # Log in to your W&B account
 from trl import SFTConfig, SFTTrainer
@@ -193,5 +191,7 @@ if __name__ == '__main__':
             main(2, device = args.device, cache_dir = args.cache_dir, batch_size = args.batch_size, num_epochs = args.num_epochs)
         else:
             main(int(args.model_num), device = args.device, cache_dir = args.cache_dir, batch_size = args.batch_size, num_epochs = args.num_epochs)
+    else:
+        main(0, device = args.device, cache_dir = args.cache_dir, batch_size = args.batch_size, num_epochs = args.num_epochs)chs = args.num_epochs)
     else:
         main(0, device = args.device, cache_dir = args.cache_dir, batch_size = args.batch_size, num_epochs = args.num_epochs)
