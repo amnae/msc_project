@@ -2,7 +2,7 @@ from transformers import AutoTokenizer
 from datasets import load_dataset, Dataset, concatenate_datasets
 import pandas as pd
 import random
-
+#
 seed = 42
 
 def apply_chat_template(data, tokenizer, dataset):
@@ -98,45 +98,46 @@ def get_split_info(dataset_name):
         datasplit = 'full'
     return split,datasplit
 
-
-base_model_file = "mistralai/Mistral-7B-Instruct-v0.3"
-#base_model_file = 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'
-cache_dir = '/cs/student/projects1/dsml/2023/elbadawi/project/.cache'
-datasets = ['allenai/ai2_arc', 'jhu-clsp/jfleg', 'openai/gsm8k', 'rajpurkar/squad_v2', 'google-research-datasets/mbpp']
-
-num_samples_per_dataset = 200
-#model = AutoModelForCausalLM.from_pretrained(base_model_file, 
-#                                        quantization_config=quantization_config,
-#                                        torch_dtype=torch.bfloat16,
-#                                        cache_dir = cache_dir)
-
-tokenizer = AutoTokenizer.from_pretrained(
-    base_model_file,
-    cache_dir = cache_dir,
-    padding_side="right",
-    add_eos_token=True,
-    add_bos_token=True,
-)
-
-sampled_datasets=[]
-for dataset_name in datasets:
-    #print(dataset_name)
-    split, datasplit = get_split_info(dataset_name)
-    #print(split, datasplit)
-    train_dataset = load_dataset(dataset_name, datasplit, split=split, cache_dir = cache_dir)
-
-    if dataset_name == 'jhu-clsp/jfleg': 
-        train_dataset = transform_jfleg(train_dataset)
-
-    train_dataset = train_dataset.map(apply_chat_template,
-                                    fn_kwargs={"tokenizer": tokenizer, "dataset":dataset_name},
-                                    desc="Applying chat template",)
-    sample_set = sample_random_datapoints(train_dataset, num_samples_per_dataset)
+def create_sampled_datasets(cache_dir = None):    
+    base_model_file = "mistralai/Mistral-7B-Instruct-v0.3"
+    #base_model_file = 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'
+    datasets = ['allenai/ai2_arc', 'jhu-clsp/jfleg', 'openai/gsm8k', 'rajpurkar/squad_v2', 'google-research-datasets/mbpp']
     
-    sampled_datasets.append(sample_set)
+    num_samples_per_dataset = 200
+    #model = AutoModelForCausalLM.from_pretrained(base_model_file, 
+    #                                        quantization_config=quantization_config,
+    #                                        torch_dtype=torch.bfloat16,
+    #                                        cache_dir = cache_dir)
+    
+    tokenizer = AutoTokenizer.from_pretrained(
+        base_model_file,
+        cache_dir = cache_dir,
+        padding_side="right",
+        add_eos_token=True,
+        add_bos_token=True,
+    )
+    
+    sampled_datasets=[]
+    for dataset_name in datasets:
+        #print(dataset_name)
+        split, datasplit = get_split_info(dataset_name)
+        #print(split, datasplit)
+        train_dataset = load_dataset(dataset_name, datasplit, split=split, cache_dir = cache_dir)
+    
+        if dataset_name == 'jhu-clsp/jfleg': 
+            train_dataset = transform_jfleg(train_dataset)
+    
+        train_dataset = train_dataset.map(apply_chat_template,
+                                        fn_kwargs={"tokenizer": tokenizer, "dataset":dataset_name},
+                                        desc="Applying chat template",)
+        sample_set = sample_random_datapoints(train_dataset, num_samples_per_dataset)
+        
+        sampled_datasets.append(sample_set)
+        return sampled_datasets
 
-def main():
+def main(cache_dir = None):
   print("creating dataset")
+  sampled_datasets= create_sampled_datasets(cache_dir)
   combined_dataset = concatenate_datasets(sampled_datasets)
   combined_dataset = combined_dataset.shuffle(seed=42)
   combined_dataset.save_to_disk(f"data/combined_dataset")
