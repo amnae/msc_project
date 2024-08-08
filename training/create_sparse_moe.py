@@ -14,6 +14,9 @@ import argparse
 import torch
 import numpy as np
 
+from huggingface_hub import login
+login("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")
+
 def main(device = 'auto', cache_dir=None):
     print('Starting.')
 
