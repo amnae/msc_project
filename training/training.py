@@ -33,7 +33,7 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, 
 
     print('Loading sparse base model...')
     print(cache_dir)
-    model = EduLLMForCausalLM.from_pretrained("amnae/base_edu_llm_mixtral",
+    model = EduLLMForCausalLM.from_pretrained("amnae/edu_llm_base",
                                             torch_dtype=torch.bfloat16,
                                             device_map = device,
                                             cache_dir = cache_dir)
