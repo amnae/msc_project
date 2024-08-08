@@ -23,7 +23,7 @@ def main(device = 'auto', cache_dir=None):
 
     print('Loading sparse base model...')
     num_experts = 5
-    repo_name = "amnae/base_edu_llm_base"
+    repo_name = "amnae/edu_llm_base"
     preconfig = MixtralConfig(num_local_experts=num_experts, device_map  = device, model_type = 'mixtral')
     sparse_model = EduLLMForCausalLM._from_config(preconfig).to(device).half()
     print('Loaded sparse base model.')
