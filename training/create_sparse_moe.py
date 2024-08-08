@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-d', 
                         '--device',
-                        default='auto',
+                        default='cpu',
                         help="Choose device for model.")    
 
     args = parser.parse_args()
