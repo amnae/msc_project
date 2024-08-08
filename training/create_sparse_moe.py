@@ -17,7 +17,7 @@ import numpy as np
 from huggingface_hub import login
 login("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")
 
-def main(device = 'auto', cache_dir=None):
+def main(device = 'cpu', cache_dir=None):
     print('Starting.')
 
     print('Loading dense model...')
