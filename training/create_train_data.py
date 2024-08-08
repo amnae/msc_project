@@ -133,7 +133,7 @@ def create_sampled_datasets(cache_dir = None):
         sample_set = sample_random_datapoints(train_dataset, num_samples_per_dataset)
         
         sampled_datasets.append(sample_set)
-        return sampled_datasets
+    return sampled_datasets
 
 def main(cache_dir = None):
   print("creating dataset")

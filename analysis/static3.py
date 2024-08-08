@@ -52,7 +52,7 @@ WORK_DIR = './outputs'
 # %%
 cache_dir = '/cs/student/projects1/dsml/2023/elbadawi/project/.cache'
 
-model_type = "damex"
+model_type = "mixtral"
 model = EduLLMForCausalLM.from_pretrained(
     f'amnae/base_edu_llm_{model_type}_trained',
     low_cpu_mem_usage=True, device_map="cpu", torch_dtype=torch.bfloat16,

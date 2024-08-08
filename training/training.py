@@ -24,7 +24,7 @@ if project_root not in sys.path:
     print(project_root)
 from modelling_edullm import EduLLMForCausalLM, MixtralConfig
 
-def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, batch_size = 5):
+def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, batch_size = 2):
     create_train_data()
     model_types = ['mixtral', 'damex', 'xmoe']
     model_type = model_types[model_number]
@@ -82,7 +82,7 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, 
     peft_config = LoraConfig(
         lora_alpha=32,
         lora_dropout=0.1,
-        r=256,
+        r=128,
         bias="none",
         task_type="CAUSAL_LM",
         target_modules = "all-linear"
@@ -90,6 +90,7 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, 
 
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
+    print(model.device)
     print("Model peft'd")
 
     args = SFTConfig(
@@ -113,6 +114,7 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, 
     print("torch.cuda.memory_reserved: %fGB"%(torch.cuda.memory_reserved(0)/1024/1024/1024))
     print("torch.cuda.max_memory_reserved: %fGB"%(torch.cuda.max_memory_reserved(0)/1024/1024/1024))
 
+    model.config.gradient_checkpointing = True
     model.config.use_cache = False
     print("Start training.")
     trainer.train()
