@@ -46,12 +46,12 @@ def main(device = 'cpu', cache_dir=None):
     noise_std_dev = 0.01
     for key in sparse_weights:
         if key in dense_weights:
-            new_sparse_weights[key] = dense_weights[key] + np.random.normal(0, noise_std_dev, dense_weights[key].shape)
+            new_sparse_weights[key] = dense_weights[key] + torch.normal(0, noise_std_dev, dense_weights[key].shape)
             if sparse_weights[key].shape != new_sparse_weights[key].shape:
                 print(f'{key} done. Shape match: {sparse_weights[key].shape == new_sparse_weights[key].shape}. New Shape: {new_sparse_weights[key].shape}. Old Shape:{sparse_weights[key].shape}.')
         elif 'gate' in key:
             # Transfer randomised numbers
-            new_sparse_weights[key] = sparse_weights[key] + np.random.normal(0, noise_std_dev, sparse_weights[key].shape)
+            new_sparse_weights[key] = sparse_weights[key] + torch.normal(0, noise_std_dev, sparse_weights[key].shape)
             if sparse_weights[key].shape != new_sparse_weights[key].shape:
                 print(f'{key} done. Shape match: {sparse_weights[key].shape == new_sparse_weights[key].shape}. New Shape: {new_sparse_weights[key].shape}. Old Shape:{sparse_weights[key].shape}.')
         elif 'block_sparse_moe' in key:
@@ -67,7 +67,7 @@ def main(device = 'cpu', cache_dir=None):
                 else:
                     print(f'Strange key: {new_key}')                
                 if new_key in dense_weights:
-                    new_sparse_weights[key] = dense_weights[new_key] + np.random.normal(0, noise_std_dev, sparse_weights[key].shape)
+                    new_sparse_weights[key] = dense_weights[new_key] + torch.normal(0, noise_std_dev, sparse_weights[key].shape)
                     if sparse_weights[key].shape != new_sparse_weights[key].shape:
                         print(f'{key} done. Shape match: {sparse_weights[key].shape == new_sparse_weights[key].shape}. New Shape: {new_sparse_weights[key].shape}. Old Shape:{sparse_weights[key].shape}.')
                 else:
