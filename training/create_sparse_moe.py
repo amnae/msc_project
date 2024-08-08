@@ -5,7 +5,7 @@ import logging
 import sys
 import argparse
 import torch
-
+import numpy as np
 def main(device = 'auto', cache_dir=None):
     print('Starting.')
 
@@ -32,14 +32,15 @@ def main(device = 'auto', cache_dir=None):
     new_sparse_weights = {}
     pattern = re.compile(r"block_sparse_moe\.experts\.\d", re.IGNORECASE)
 
+    noise_std_dev = 0.01
     for key in sparse_weights:
         if key in dense_weights:
-            new_sparse_weights[key] = dense_weights[key]
+            new_sparse_weights[key] = dense_weights[key] + np.random.normal(0, noise_std_dev, dense_weights[key].shape)
             if sparse_weights[key].shape != new_sparse_weights[key].shape:
                 print(f'{key} done. Shape match: {sparse_weights[key].shape == new_sparse_weights[key].shape}. New Shape: {new_sparse_weights[key].shape}. Old Shape:{sparse_weights[key].shape}.')
         elif 'gate' in key:
             # Transfer randomised numbers
-            new_sparse_weights[key] = sparse_weights[key]
+            new_sparse_weights[key] = sparse_weights[key] + np.random.normal(0, noise_std_dev, sparse_weights[key].shape)
             if sparse_weights[key].shape != new_sparse_weights[key].shape:
                 print(f'{key} done. Shape match: {sparse_weights[key].shape == new_sparse_weights[key].shape}. New Shape: {new_sparse_weights[key].shape}. Old Shape:{sparse_weights[key].shape}.')
         elif 'block_sparse_moe' in key:
@@ -55,7 +56,7 @@ def main(device = 'auto', cache_dir=None):
                 else:
                     print(f'Strange key: {new_key}')                
                 if new_key in dense_weights:
-                    new_sparse_weights[key] = dense_weights[new_key]
+                    new_sparse_weights[key] = dense_weights[new_key] + np.random.normal(0, noise_std_dev, sparse_weights[key].shape)
                     if sparse_weights[key].shape != new_sparse_weights[key].shape:
                         print(f'{key} done. Shape match: {sparse_weights[key].shape == new_sparse_weights[key].shape}. New Shape: {new_sparse_weights[key].shape}. Old Shape:{sparse_weights[key].shape}.')
                 else:
@@ -83,7 +84,6 @@ def main(device = 'auto', cache_dir=None):
     print("Model saved.")
 
 if __name__ == '__main__':
-    model_types = ['mixtral', 'damex', 'xmoe']
     #python training/create_sparse_moe.py -m 'all' -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache' -d 'cuda:0'
     parser = argparse.ArgumentParser()
 

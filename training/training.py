@@ -81,8 +81,8 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, 
 
     peft_config = LoraConfig(
         lora_alpha=32,
-        lora_dropout=0.1,
-        r=128,
+        lora_dropout=0,
+        r=256,
         bias="none",
         task_type="CAUSAL_LM",
         target_modules = "all-linear"
