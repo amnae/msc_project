@@ -24,7 +24,7 @@ if project_root not in sys.path:
     print(project_root)
 from modelling_edullm import EduLLMForCausalLM, MixtralConfig
 
-def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, batch_size = 2):
+def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, batch_size = 1):
     create_train_data()
     model_types = ['mixtral', 'damex', 'xmoe']
     model_type = model_types[model_number]
@@ -197,10 +197,10 @@ if __name__ == '__main__':
 
     if args.model_num:
         if args.model_num == 'all':
-            main(0, device = args.device, cache_dir = args.cache_dir, batch_size = args.batch_size, num_epochs = args.num_epochs)
-            main(1, device = args.device, cache_dir = args.cache_dir, batch_size = args.batch_size, num_epochs = args.num_epochs)
-            main(2, device = args.device, cache_dir = args.cache_dir, batch_size = args.batch_size, num_epochs = args.num_epochs)
+            main(0, device = args.device, cache_dir = args.cache_dir, batch_size = int(args.batch_size), num_epochs = int(args.num_epochs))
+            main(1, device = args.device, cache_dir = args.cache_dir, batch_size = int(args.batch_size), num_epochs = int(args.num_epochs))
+            main(2, device = args.device, cache_dir = args.cache_dir, batch_size = int(args.batch_size), num_epochs = int(args.num_epochs))
         else:
-            main(int(args.model_num), device = args.device, cache_dir = args.cache_dir, batch_size = args.batch_size, num_epochs = args.num_epochs)
+            main(int(args.model_num), device = args.device, cache_dir = args.cache_dir, batch_size = int(args.batch_size), num_epochs = int(args.num_epochs))
     else:
-        main(0, device = args.device, cache_dir = args.cache_dir, batch_size = args.batch_size, num_epochs = args.num_epochs)
+        main(0, device = args.device, cache_dir = args.cache_dir, batch_size = int(args.batch_size), num_epochs = int(args.num_epochs))
