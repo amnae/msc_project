@@ -53,7 +53,7 @@ WORK_DIR = './outputs'
 #)
 #mixtral_tok = AutoTokenizer.from_pretrained("./ckpt/mixtral")
 #mixtral_model.eval()
-def main(model_number = 0, device = 'auto', cache_dir='.cache'):
+def main(model_number = 0, device_map = 'auto', cache_dir='.cache'):
     # %%
     #cache_dir = '/cs/student/projects1/dsml/2023/elbadawi/project/.cache'
 
@@ -554,6 +554,7 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache'):
 
 if __name__ == '__main__':
     #python training/training.py -m 'all' -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache' -d 'cuda:0' -e 3
+    #python training/static_analysis.py -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache'
     model_types = ['mixtral', 'damex', 'xmoe']
     dataset_path = "data/combined_dataset"
     batch_size = 5
@@ -572,17 +573,17 @@ if __name__ == '__main__':
 
     parser.add_argument('-d', 
                         '--device',
-                        default='auto',
+                        default='cpu',
                         help="Choose device for model.")    
     
     args = parser.parse_args()
 
     if args.model_num:
         if args.model_num == 'all':
-            main(0, device = args.device, cache_dir = args.cache_dir)
-            main(1, device = args.device, cache_dir = args.cache_dir)
-            main(2, device = args.device, cache_dir = args.cache_dir)
+            main(0, device_map = args.device, cache_dir = args.cache_dir)
+            main(1, device_map = args.device, cache_dir = args.cache_dir)
+            main(2, device_map = args.device, cache_dir = args.cache_dir)
         else:
-            main(int(args.model_num), device = args.device, cache_dir = args.cache_dir)
+            main(int(args.model_num), device_map = args.device, cache_dir = args.cache_dir)
     else:
-        main(0, device = args.device, cache_dir = args.cache_dir)
+        main(0, device_map = args.device, cache_dir = args.cache_dir)
