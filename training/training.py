@@ -92,7 +92,7 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, 
     model.print_trainable_parameters()
     print(model.device)
     print("Model peft'd")
-
+    print(f"Batch size: {batch_size}")
     args = SFTConfig(
         output_dir=repo_name+"_sft",
         dataset_text_field="text",    
@@ -164,7 +164,7 @@ if __name__ == '__main__':
     #python training/training.py -m 'all' -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache' -d 'cuda:0' -e 3
     model_types = ['mixtral', 'damex', 'xmoe']
     dataset_path = "data/combined_dataset"
-    batch_size = 5
+    batch_size = 1
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', 
@@ -190,7 +190,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-b', 
                         '--batch_size',
-                        default='5',
+                        default='1',
                         help="Choose batch size for training.")  
 
     args = parser.parse_args()
