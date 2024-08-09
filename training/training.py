@@ -61,7 +61,7 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, 
     print("torch.cuda.max_memory_reserved: %fGB"%(torch.cuda.max_memory_reserved(0)/1024/1024/1024))
 
     tokenizer = AutoTokenizer.from_pretrained(
-        repo_name,
+        "amnae/edu_llm_base",
         padding_side="right",
         add_eos_token=True,
         add_bos_token=True,

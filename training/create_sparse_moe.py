@@ -83,6 +83,22 @@ def main(device = 'cpu', cache_dir=None):
     sparse_model.load_state_dict(new_sparse_weights, strict=True, )
 
 
+    print("Saving model...")
+    for i in range(0,10):
+        try:
+            sparse_model.push_to_hub(repo_name, cache_dir=cache_dir)
+            tokenizer.push_to_hub(repo_name)
+        except Exception as error:
+            print(error)
+            print(f'Trying again: {i+1}/10')
+            continue
+        else:
+            if i == 9:
+                print("10th fail. Give up.")
+                sys.exit(0)
+            break
+    print("Model saved.")
+
     messages = [
         {"role": "user", "content": "What do these two things have in common? a) bleaching clothes and b) an apple turning brown?\nLet's think step by step\nAnswer:\n."}
     ]
@@ -105,22 +121,6 @@ def main(device = 'cpu', cache_dir=None):
     tokens = tokenizer.batch_decode(generated_ids)[0]
     print(tokens)
 
-
-    print("Saving model...")
-    for i in range(0,10):
-        try:
-            sparse_model.push_to_hub(repo_name, cache_dir=cache_dir)
-            tokenizer.push_to_hub(repo_name)
-        except Exception as error:
-            print(error)
-            print(f'Trying again: {i+1}/10')
-            continue
-        else:
-            if i == 9:
-                print("10th fail. Give up.")
-                sys.exit(0)
-            break
-    print("Model saved.")
 
 if __name__ == '__main__':
     #python training/create_sparse_moe.py -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache'
