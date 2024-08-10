@@ -357,45 +357,6 @@ def main(model_number = 0, device_map = 'auto', cache_dir='.cache'):
         plot_one_layer(all_sim_arr[i], i, 'full_colorbar', global_vmin, global_vmax)
 
     # %% [markdown]
-    # Quatitative analysis (linear regression)
-
-    # %%
-    from scipy.stats import linregress
-
-    save_dir = os.path.join(WORK_DIR, f'edullm/{model_type}_gate_sim_reg')
-    output_dir = os.path.join(save_dir, 'data')
-    os.makedirs(output_dir, exist_ok=True)
-
-    # Reorganize the similarity matrices to be one-to-one value pairs.
-    all_data = [[np.array([]) for _ in range(len(matrices))] for _ in range(num_layers)]
-    for i in range(num_layers):
-        for j, sim_arr in enumerate(all_sim_arr[i]):
-            # Iterate over the similarity array to flatten the 
-            # low triangle area (excluding the diagonal).
-            for row in range(num_experts):
-                for col in range(row):
-                    all_data[i][j] = np.append(all_data[i][j], sim_arr[row][col])
-
-    # Perform linear regression.
-    sum_r2 = [0. for _ in range(len(matrices))]
-    all_r_lst = [[] for _ in range(num_layers)]
-    for i in range(num_layers):
-        for j in range(1, len(matrices)):
-            X, Y = all_data[i][j], all_data[i][0]
-            slope, intercept, r, p, stderr = linregress(X, Y)
-            r2 = round(r**2, 2)
-            sum_r2[j] += r2
-            all_r_lst[i].append(r)
-
-    print('Average regression score\nup_proj: {:.2f}\ngate_proj: {:.2f}\ndown_proj: {:.2f}'.format(
-        sum_r2[1]/num_layers, sum_r2[2]/num_layers, sum_r2[3]/num_layers))
-
-    with open(os.path.join(output_dir, 'all_data'), 'wb') as f:
-        pickle.dump(all_data, f)
-    with open(os.path.join(output_dir, 'all_r_lst'), 'wb') as f:
-        pickle.dump(all_r_lst, f)
-
-    # %% [markdown]
     # ## Projection of Expert Matrices in Low-dimensional Space
 
     # %% [markdown]
@@ -429,8 +390,14 @@ def main(model_number = 0, device_map = 'auto', cache_dir='.cache'):
                     all_matrix[idx] = getattr(model.model.layers[i].block_sparse_moe.experts[idx], mix_mat).weight.flatten()
             if use_normalize:
                 mean, std = torch.mean(all_matrix, dim=0), torch.std(all_matrix, dim=0)
+                #std = std if std != 0 else 1
+                std = torch.where(std == 0, torch.tensor(1), std)
                 all_matrix = (all_matrix - mean) / std
             pca = PCA(n_components=2, svd_solver='full')
+            print(pca)
+            ten = all_matrix.float().cpu().detach().numpy().astype(ml_dtypes.bfloat16)
+            print(np.isnan(ten).any())
+            print(sum(sum(np.isnan(ten))))
             projected_matrix = pca.fit_transform(all_matrix.float().cpu().detach().numpy().astype(ml_dtypes.bfloat16))
             all_projected_matrix[i].append(projected_matrix)
 
@@ -550,11 +517,50 @@ def main(model_number = 0, device_map = 'auto', cache_dir='.cache'):
         elif n_dim == 3:
             plot_one_3d_layer(projected_neuron_lst, i)
 
+    # %% [markdown]
+    # Quatitative analysis (linear regression)
+
+    # %%
+    from scipy.stats import linregress
+
+    save_dir = os.path.join(WORK_DIR, f'edullm/{model_type}_gate_sim_reg')
+    output_dir = os.path.join(save_dir, 'data')
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Reorganize the similarity matrices to be one-to-one value pairs.
+    all_data = [[np.array([]) for _ in range(len(matrices))] for _ in range(num_layers)]
+    for i in range(num_layers):
+        for j, sim_arr in enumerate(all_sim_arr[i]):
+            # Iterate over the similarity array to flatten the 
+            # low triangle area (excluding the diagonal).
+            for row in range(num_experts):
+                for col in range(row):
+                    all_data[i][j] = np.append(all_data[i][j], sim_arr[row][col])
+
+    # Perform linear regression.
+    sum_r2 = [0. for _ in range(len(matrices))]
+    all_r_lst = [[] for _ in range(num_layers)]
+    for i in range(num_layers):
+        for j in range(1, len(matrices)):
+            X, Y = all_data[i][j], all_data[i][0]
+            slope, intercept, r, p, stderr = linregress(X, Y)
+            r2 = round(r**2, 2)
+            sum_r2[j] += r2
+            all_r_lst[i].append(r)
+
+    print('Average regression score\nup_proj: {:.2f}\ngate_proj: {:.2f}\ndown_proj: {:.2f}'.format(
+        sum_r2[1]/num_layers, sum_r2[2]/num_layers, sum_r2[3]/num_layers))
+
+    with open(os.path.join(output_dir, 'all_data'), 'wb') as f:
+        pickle.dump(all_data, f)
+    with open(os.path.join(output_dir, 'all_r_lst'), 'wb') as f:
+        pickle.dump(all_r_lst, f)
+
 
 
 if __name__ == '__main__':
     #python training/training.py -m 'all' -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache' -d 'cuda:0' -e 3
-    #python training/static_analysis.py -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache'
+    #python analysis/static_analysis.py -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache' -d 'cuda' -m 0
     model_types = ['mixtral', 'damex', 'xmoe']
     dataset_path = "data/combined_dataset"
     batch_size = 5
