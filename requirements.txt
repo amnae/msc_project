@@ -1,0 +1,16 @@
+torch
+torchvision
+transformers
+huggingface_hub
+datasets
+faulthandler
+pandas
+numpy
+argparse
+peft
+trl
+dotenv
+mmengine
+opencompass @ git+https://github.com/open-compass/opencompass
+modelscope
+oss2

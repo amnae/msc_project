@@ -53,8 +53,6 @@ You can install the required dependencies using:
 pip install -r requirements.txt
 ```
 
-*(Note: A `requirements.txt` file should be added with the necessary packages)*
-
 ## Setup
 
 1. Clone the repository:
