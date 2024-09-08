@@ -81,15 +81,17 @@ python training/create_train_data.py
 
 ```bash
 # Set up and create a Sparse Mixture of Experts (MoE) model and upload it to HuggingFace.
-python create_sparse_moe.py
+python training/create_sparse_moe.py
 ```
 
 #### Arguments:
 - `--cache_dir` (`-c`): Cache directory for model weights.
 - `--device` (`-d`): Device for training (e.g., `cpu`, `cuda`).
 
+```bash
 # Train the model
 python training/training.py
+```
 
 #### Arguments:
 - `--model_num` or `-m`: Model to train (`0`: Mixtral, `1`: Damex, `2`: XMOE, `all`: train all). (default: 0)
@@ -100,6 +102,10 @@ python training/training.py
 
 This script loads datasets, trains models, and saves them to the HuggingFace Hub.
 
+#### Usage:
+```bash
+python training/training.py --model_num 0 --device cuda --cache_dir .cache --num_epochs 1 --batch_size 1
+```
 
 ### Evaluation
 
@@ -127,7 +133,7 @@ python analysis/static_analysis.py
 
 #### Usage:
 ```bash
-python static_analysis.py --model_num 0 --device cuda --cache_dir .cache
+python analysis/static_analysis.py --model_num 0 --device cuda --cache_dir .cache
 ```
 
 ### Dynamic Analysis
@@ -146,7 +152,7 @@ python analysis/dynamic_analysis.py
 
 #### Usage:
 ```bash
-python dynamic_analysis.py --model_num 0 --device cuda --cache_dir .cache
+python analysis/dynamic_analysis.py --model_num 0 --device cuda --cache_dir .cache
 ```
 
 The script evaluates expert outputs and generates visualizations of dynamic model behaviors.
