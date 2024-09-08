@@ -136,9 +136,9 @@ def create_sampled_datasets(cache_dir = None):
     return sampled_datasets
 
 def main(cache_dir = None):
-  print("creating dataset")
+  print("Creating dataset")
   sampled_datasets= create_sampled_datasets(cache_dir)
   combined_dataset = concatenate_datasets(sampled_datasets)
   combined_dataset = combined_dataset.shuffle(seed=42)
   combined_dataset.save_to_disk(f"data/combined_dataset")
-  print("created dataset")
+  print("Created dataset")

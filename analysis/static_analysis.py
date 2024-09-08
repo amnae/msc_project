@@ -559,8 +559,6 @@ def main(model_number = 0, device_map = 'auto', cache_dir='.cache'):
 
 
 if __name__ == '__main__':
-    #python training/training.py -m 'all' -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache' -d 'cuda:0' -e 3
-    #python analysis/static_analysis.py -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache' -d 'cuda' -m 0
     model_types = ['mixtral', 'damex', 'xmoe']
     dataset_path = "data/combined_dataset"
     batch_size = 5

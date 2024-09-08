@@ -1,23 +1,15 @@
 from transformers import AutoTokenizer
 import torch
-from datasets import load_dataset, load_from_disk
+from datasets import load_from_disk
 from datetime import datetime
 from peft import LoraConfig, get_peft_model 
-from torch.profiler import profile, record_function, ProfilerActivity
 import argparse
-# Log in to your W&B account
+
 from trl import SFTConfig, SFTTrainer
-from peft import prepare_model_for_kbit_training
-import logging
 import os
-import wandb
 import sys
 from create_train_data import main as create_train_data
 
-#wandb.login()
-#wandb.init()
-
-#project_root = os.path.abspath(os.path.join(os.getcwd(), '..'))
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
     sys.path.append(project_root)
@@ -137,31 +129,7 @@ def main(model_number = 0, device = 'auto', cache_dir='.cache', num_epochs = 1, 
             break
     print("Model saved.")
 
-    messages = [
-        {"role": "user", "content": "What do these two things have in common? a) bleaching clothes and b) an apple turning brown?\nLet's think step by step\nAnswer:\n."}
-    ]
-    model_inputs = tokenizer.apply_chat_template(messages, return_tensors="pt")
-    print("Tokenized.")
-    print("Generating response.")
-    generated_ids = model.generate(model_inputs, max_new_tokens=200, do_sample=True)
-    generated_ids = generated_ids.to('cuda') 
-    tokens = tokenizer.batch_decode(generated_ids)[0]
-    print(tokens)
-
-    messages = [
-        {"role": "user", "content": "Janet's ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?\nLet's think step by step\nAnswer:\n."}
-    ]
-    model_inputs = tokenizer.apply_chat_template(messages, return_tensors="pt")
-    print("Tokenized.")
-    print("Generating response.")
-    generated_ids = model.generate(model_inputs, max_new_tokens=200, do_sample=True)
-    generated_ids = generated_ids.to('cuda') 
-    tokens = tokenizer.batch_decode(generated_ids)[0]
-    print(tokens)
-
-
 if __name__ == '__main__':
-    #python training/training.py -m 'all' -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache' -d 'cuda:0' -e 3
     model_types = ['mixtral', 'damex', 'xmoe']
     dataset_path = "data/combined_dataset"
     batch_size = 1

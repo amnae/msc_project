@@ -8,14 +8,19 @@ if project_root not in sys.path:
 from modelling_edullm import EduLLMForCausalLM, MixtralConfig
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 import re
-import logging
 import sys
 import argparse
 import torch
 import numpy as np
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+HF_LOGIN = os.getenv('HF_LOGIN')
 
 from huggingface_hub import login
-login("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")
+login(HF_LOGIN)
 
 def main(device = 'cpu', cache_dir=None):
     print('Starting.')
@@ -99,31 +104,7 @@ def main(device = 'cpu', cache_dir=None):
             break
     print("Model saved.")
 
-    messages = [
-        {"role": "user", "content": "What do these two things have in common? a) bleaching clothes and b) an apple turning brown?\nLet's think step by step\nAnswer:\n."}
-    ]
-    model_inputs = tokenizer.apply_chat_template(messages, return_tensors="pt")
-    print("Tokenized.")
-    print("Generating response.")
-    generated_ids = sparse_model.generate(model_inputs, max_new_tokens=200, do_sample=True)
-    generated_ids = generated_ids.to('cuda') 
-    tokens = tokenizer.batch_decode(generated_ids)[0]
-    print(tokens)
-
-    messages = [
-        {"role": "user", "content": "Janet's ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?\nLet's think step by step\nAnswer:\n."}
-    ]
-    model_inputs = tokenizer.apply_chat_template(messages, return_tensors="pt")
-    print("Tokenized.")
-    print("Generating response.")
-    generated_ids = sparse_model.generate(model_inputs, max_new_tokens=200, do_sample=True)
-    generated_ids = generated_ids.to('cuda') 
-    tokens = tokenizer.batch_decode(generated_ids)[0]
-    print(tokens)
-
-
 if __name__ == '__main__':
-    #python training/create_sparse_moe.py -c '/cs/student/projects1/dsml/2023/elbadawi/project/.cache'
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-c', 
