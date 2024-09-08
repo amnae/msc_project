@@ -19,11 +19,11 @@ msc_project-main/
 ├── analysis/
 │   ├── static_analysis.py       # Script for performing static analysis of the models
 │   ├── dynamic_analysis.py      # Script for performing dynamic analysis of the models
-│   └── static_analysis.py       # Script for performing static analysis of the models│
+│   └── wikitext103_test.csv     # Text used in dynamic analysis
 ├── eval/
 │   ├── base_model_config.py     # Base configuration for model evaluation
 │   ├── dev-v2.0.json            # Dataset for evaluation
-│   ├── huggingface_custom.py    # Custom HuggingFace utilities for evaluation
+│   ├── huggingface_custom.py    # Custom HuggingFace utilities for opencompass evaluation
 │   └── README.md                # Instructions related to evaluation
 │
 ├── training/
@@ -77,18 +77,38 @@ The training scripts are located in the `training/` directory. You can create th
 ```bash
 # Create the training data
 python training/create_train_data.py
+```
+
+```bash
+# Set up and create a Sparse Mixture of Experts (MoE) model and upload it to HuggingFace.
+python create_sparse_moe.py
+```
+
+#### Arguments:
+- `--cache_dir` (`-c`): Cache directory for model weights.
+- `--device` (`-d`): Device for training (e.g., `cpu`, `cuda`).
 
 # Train the model
 python training/training.py
-```
+
+#### Arguments:
+- `--model_num` or `-m`: Model to train (`0`: Mixtral, `1`: Damex, `2`: XMOE, `all`: train all). (default: 0)
+- `--cache_dir` or `-c`: Cache directory for models. (default: None)
+- `--device` or `-d`: Device for training (`cpu`, `cuda`, `auto`). (default:'auto')
+- `--num_epochs` or `-e`: Number of training epochs. (default: 1)
+- `--batch_size` or `-b`: Training batch size. (default: 1)
+
+This script loads datasets, trains models, and saves them to the HuggingFace Hub.
+
 
 ### Evaluation
 
-The evaluation scripts can be found in the `eval/` directory. You can run model evaluations by configuring the settings in `base_model_config.py` and using the custom HuggingFace utilities:
+The evaluation scripts can be found in the `eval/` directory. You can run model evaluations by installinng opencompass, following the README.md in the `eval/` directory, and running the following command. Change the 'model_path' variable  in line 12 to the model you would like to test.
 
 ```bash
 # Run evaluation
-python eval/huggingface_custom.py
+python run.py configs/base_model_config.py
+
 ```
 
 ### Static Analysis
@@ -96,17 +116,37 @@ python eval/huggingface_custom.py
 You can run static analysis on the model using the script in the `analysis/` directory:
 
 ```bash
+#Analyse model parameters like expert weight matrices and gate embeddings.
 python analysis/static_analysis.py
 ```
 
-## Contributing
+#### Arguments:
+- `--model_num` (`-m`): Model to analyze (`0`: Mixtral, `1`: Damex, `2`: XMOE, `'all'`: all models).
+- `--cache_dir` (`-c`): Cache directory.
+- `--device` (`-d`): Device for execution (`cpu`, `cuda`).
 
-If you'd like to contribute, please fork the repository, make your changes, and submit a pull request.
+#### Usage:
+```bash
+python static_analysis.py --model_num 0 --device cuda --cache_dir .cache
+```
 
-## License
+### Dynamic Analysis
 
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
+You can analyse dynamic behaviors of models, including expert outputs, norms, intermediate states, and chosen experts.
 
----
+```bash
+#Analyse dynamic model behaviors.
+python analysis/dynamic_analysis.py
+```
 
-Feel free to customize the sections as per your project's specific details!
+#### Arguments:
+- `--cache_dir` (`-c`): Directory to cache models.
+- `--device` (`-d`): Device for model execution (`cpu`, `cuda`).
+- `--model_num` (`-m`): Model to analyze (`0`: Mixtral, `1`: Damex, `2`: XMOE, `all`: all models).
+
+#### Usage:
+```bash
+python dynamic_analysis.py --model_num 0 --device cuda --cache_dir .cache
+```
+
+The script evaluates expert outputs and generates visualizations of dynamic model behaviors.

@@ -3,12 +3,15 @@ from mmengine.config import read_base
 import torch
 #from huggingface_hub import login
 import faulthandler; faulthandler.enable()
-with read_base():
-    from .datasets.gsm8k.gsm8k_gen import gsm8k_datasets 
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+model_path = 'amnae/base_edu_llm_mixtral_trained'
 
 model_kwargs = {
-    "cache_dir": '/cs/student/projects1/dsml/2023/elbadawi/project/.cache',
     "torch_dtype": torch.float16,
     "device_map": "cpu"
 }
@@ -18,7 +21,7 @@ models = [
     dict(
         type=EduLLMwithChatTemplate,
         # Parameters for `HuggingFaceCausalLM` initialization.
-        path='amnae/base_edu_llm_mixtral_trained',
+        path=model_path,
         tokenizer_kwargs=dict(padding_side='left', truncation_side='left'),
         max_seq_len=512,
         batch_padding=False,
@@ -35,6 +38,6 @@ with read_base():
     from .datasets.ARC_e.ARC_e_gen import ARC_e_datasets
     from .datasets.squad20.squad20_gen import squad20_datasets
     from .datasets.mbpp.mbpp_gen import mbpp_datasets
+    from .datasets.gsm8k.gsm8k_gen import gsm8k_datasets 
 
-
-datasets = [ARC_e_datasets, squad20_datasets, mbpp_datasets]
+datasets = [ARC_e_datasets, squad20_datasets, mbpp_datasets, gsm8k_datasets]

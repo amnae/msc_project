@@ -142,3 +142,6 @@ def main(cache_dir = None):
   combined_dataset = combined_dataset.shuffle(seed=42)
   combined_dataset.save_to_disk(f"data/combined_dataset")
   print("Created dataset")
+
+if __name__ == '__main__':
+    main(cache_dir = None)
