@@ -8,8 +8,6 @@ This repository contains the code for my MSc Data Science and Machine Learning p
 - [Dependencies](#dependencies)
 - [Setup](#setup)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Project Structure
 
@@ -68,15 +66,14 @@ pip install -r requirements.txt
 
 ## Usage
 
-### Training
-
 The training scripts are located in the `training/` directory. You can create the training dataset and initiate training as follows:
 
+### Create the training data
 ```bash
 # Create the training data
 python training/create_train_data.py
 ```
-
+### Create a Sparse Mixture of Experts (MoE) model and upload it to HuggingFace.
 ```bash
 # Set up and create a Sparse Mixture of Experts (MoE) model and upload it to HuggingFace.
 python training/create_sparse_moe.py
@@ -92,7 +89,7 @@ python training/create_sparse_moe.py --cache_dir .cache 0 --device cuda
 ```
 
 
-
+### Train the model
 ```bash
 # Train the model
 python training/training.py
