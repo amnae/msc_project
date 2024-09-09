@@ -91,6 +91,8 @@ python training/create_sparse_moe.py
 python training/create_sparse_moe.py --cache_dir .cache 0 --device cuda
 ```
 
+
+
 ```bash
 # Train the model
 python training/training.py
